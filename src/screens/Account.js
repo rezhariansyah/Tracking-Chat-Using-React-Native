@@ -1,31 +1,79 @@
 import React, {Component, Fragment} from 'react';
-import {View, Text, StyleSheet, Image, TouchableHighlight} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableHighlight,
+  AsyncStorage,
+} from 'react-native';
+import firebase from 'firebase';
 
 class Account extends Component {
+  state = {
+    email: '',
+    name: ''
+  };
+
+  componentWillUnmount = () => {
+    this.componentDidMount.remove()
+  }
+
+  componentDidMount = async () => {
+    await this.getData();
+  };
+
+  getData = async () => {
+    await AsyncStorage.getItem('email', (error, result) => {
+      this.setState({email: result});
+    });
+
+    await AsyncStorage.getItem('name', (error, result) => {
+      this.setState({name: result});
+    });
+
+    await AsyncStorage.getItem('image', (error, result) => {
+      this.setState({image: result});
+    });
+  };
+
+  logout = async () => {
+    const userToken = await AsyncStorage.getItem('uid');
+    firebase
+      .database()
+      .ref('/user/' + userToken)
+      .update({status: 'offline'});
+    let keys = ['uid', 'name', 'image'];
+    await AsyncStorage.multiRemove(keys, error => {
+      this.props.navigation.navigate('Login');
+    });
+    this.setState({
+      email : '',
+      name : ''
+    })
+  };
+
   render() {
     return (
       <Fragment>
         <View style={styles.container}>
           <TouchableHighlight style={[styles.profileImgContainer]}>
-            <Image
-              source={require('../assets/images/man.png')}
-              style={styles.profileImg}
-            />
+            <Image source={require('../assets/images/man.png')} style={styles.profileImg} />
           </TouchableHighlight>
           <View style={styles.textUser}>
-            <Text style={{color: 'white'}}>Full Name</Text>
-            <Text style={{color: 'white'}}>Email</Text>
+            <Text style={{color: 'white'}}>{this.state.name}</Text>
+            <Text style={{color: 'white'}}>{this.state.email}</Text>
           </View>
         </View>
         <View style={styles.dataUser}>
           <TouchableHighlight
-            style={[styles.buttonContainer, styles.logoutButton]}
+            style={[styles.buttonContainer, styles.multerButton]}
             onPress={() => this.props.navigation.navigate('Login')}>
             <Text style={styles.logoutText}>Change Image Profile</Text>
           </TouchableHighlight>
           <TouchableHighlight
             style={[styles.buttonContainer, styles.logoutButton]}
-            onPress={() => this.props.navigation.navigate('Login')}>
+            onPress={this.logout}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableHighlight>
         </View>
@@ -72,6 +120,9 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     backgroundColor: '#F14336',
+  },
+  multerButton: {
+    backgroundColor: '#232423',
   },
   logoutText: {
     color: 'white',

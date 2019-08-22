@@ -1,17 +1,19 @@
-import React from "react";
+import React from 'react';
 import {
   createStackNavigator,
   createAppContainer,
   createMaterialTopTabNavigator,
 } from 'react-navigation';
-import { Icon } from "native-base";
-import { Image } from "react-native";
+import {Icon} from 'native-base';
+import {Image} from 'react-native';
 
 import Home from '../../screens/Home';
 import Account from '../../screens/Account';
 import Chats from '../../screens/Chats';
 import Login from '../../screens/Login';
 import Register from '../../screens/Register';
+import Auth from '../../screens/auth';
+import ChatRoom from '../../screens/ChatRoom';
 
 const AppTabNavigator = createMaterialTopTabNavigator(
   {
@@ -69,13 +71,15 @@ const AppStackNavigator = createStackNavigator(
   {
     Home: AppTabNavigator,
     Account,
+    Auth,
     Chats,
     Login,
     Register,
+    ChatRoom
   },
   {
     headerMode: 'none',
-    initialRouteName: 'Home',
+    initialRouteName: 'Auth',
   },
 );
 
